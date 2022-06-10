@@ -49,10 +49,22 @@ export function Home() {
 
   function handleFilterLoginData() {
     // Filter results inside data, save with setSearchListData
+    const dadosFiltrados = searchListData.filter(data => {
+      if (data.service_name.includes(searchText)) {
+        return data;
+      }
+    });
+    setSearchListData(dadosFiltrados);
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
+    if (text === '') {
+      setSearchListData(data);
+      setSearchText('');
+    } else {
+      setSearchText(text);
+    }
   }
 
   useFocusEffect(useCallback(() => {
