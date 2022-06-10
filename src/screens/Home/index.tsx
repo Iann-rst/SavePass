@@ -13,6 +13,7 @@ import {
   TotalPassCount,
   LoginList,
 } from './styles';
+import { Alert } from 'react-native';
 
 interface LoginDataProps {
   id: string;
@@ -31,6 +32,19 @@ export function Home() {
   async function loadData() {
     const dataKey = '@savepass:logins';
     // Get asyncStorage data, use setSearchListData and setData
+
+    //Buscando as informações no AsyncStorage
+    try {
+      const data = await AsyncStorage.getItem(dataKey);
+      const dataFormatada = data ? JSON.parse(data) : [];
+
+      setData(dataFormatada);
+      setSearchListData(dataFormatada);
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Não foi possível acessar as senhas salvas!');
+    }
   }
 
   function handleFilterLoginData() {
