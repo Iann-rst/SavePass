@@ -42,6 +42,7 @@ export function RegisterLoginData() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: {
       errors
     }
@@ -49,7 +50,8 @@ export function RegisterLoginData() {
     resolver: yupResolver(schema)
   });
 
-  async function handleRegister(formData: FormData) {
+  async function handleRegister(formData: Partial<FormData>) {
+
     const newLoginData = {
       id: String(uuid.v4()),
       ...formData
@@ -58,6 +60,33 @@ export function RegisterLoginData() {
     const dataKey = '@savepass:logins';
 
     // Save data on AsyncStorage and navigate to 'Home' screen
+
+
+    try {
+      //Pegar os dados que ja estão no AsyncStorage
+      const response = await AsyncStorage.getItem(dataKey);
+      const dados = response ? JSON.parse(response) : [];
+
+      //Adiciona os dados que ja estavam no AsyncStorage, junto com o novo Login
+      const dataFormatada = [
+        ...dados,
+        newLoginData
+      ]
+
+      //Adiciono os dados no AsyncStorage
+      await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatada));
+
+      //console.log(dataFormatada);
+      //Limpa os campos
+      reset();
+
+      //Volta para a tela Home
+      navigate('Home');
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Não foi possível salvar')
+    }
   }
 
   return (
@@ -74,8 +103,7 @@ export function RegisterLoginData() {
             title="Nome do serviço"
             name="service_name"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.service_name && errors.service_name.message
             }
             control={control}
             autoCapitalize="sentences"
@@ -86,8 +114,7 @@ export function RegisterLoginData() {
             title="E-mail ou usuário"
             name="email"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.email && errors.email.message
             }
             control={control}
             autoCorrect={false}
@@ -99,8 +126,7 @@ export function RegisterLoginData() {
             title="Senha"
             name="password"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry
